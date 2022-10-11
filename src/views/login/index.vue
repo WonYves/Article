@@ -82,7 +82,7 @@ export default {
             // 成功
             this.$message.success(res.message)
             this.updateToken(res.token) // 第五步  提交使用函数调用时接收实参 将data中的token值通过在mutation中定义好的函数保存在vuex中
-            this.$router.push('/home')
+            this.$router.push('/')
           } else {
             // 失败
             this.$message.error(res.message)

@@ -1,11 +1,13 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
+import Vuex, { Store } from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
+import { getUserInfoAPI } from '@/api'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    token: '' // 第一步 state中定义变量token  保存token字符串
+    token: '', // 第一步 state中定义变量token  保存token字符串
+    userInfo: {}
   },
   getters: {},
   mutations: {
@@ -14,9 +16,20 @@ export default new Vuex.Store({
     // 第三步在Login中
     updateToken (state, value) {
       state.token = value
+    },
+    // 保存用户信息
+    updateUserInfo (state, value) {
+      state.userInfo = value
     }
   },
-  actions: {},
+  actions: {
+    // 请求用户信息
+    async getUserInfoActions (store) {
+      const res = await getUserInfoAPI()
+      console.log(res)
+      store.commit('updateUserInfo', res.data.data)
+    }
+  },
   modules: {},
   // 插件
   plugins: [
