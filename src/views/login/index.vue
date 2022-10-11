@@ -34,62 +34,66 @@
 </template>
 
 <script>
-import { loginAPI } from "@/api";
+import { loginAPI } from '@/api'
+import { mapMutations } from 'vuex' // 第三步引入映射引入 mutations from vuex
 export default {
-  name: "my-login",
-  data() {
+  name: 'my-login',
+  data () {
     return {
       // 登录表单的数据对象
       loginForm: {
-        username: "",
-        password: "",
+        username: '',
+        password: ''
       },
       // 登录表单的验证规则对象
       loginRules: {
         username: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
+          { required: true, message: '请输入用户名', trigger: 'blur' },
           {
             pattern: /^[a-zA-Z0-9]{1,10}$/,
-            message: "用户名必须是1-10的字母数字",
-            trigger: "blur",
-          },
+            message: '用户名必须是1-10的字母数字',
+            trigger: 'blur'
+          }
         ],
         password: [
-          { required: true, message: "请输入密码", trigger: "blur" },
+          { required: true, message: '请输入密码', trigger: 'blur' },
           {
             pattern: /^\S{6,15}$/,
-            message: "密码必须是6-15的非空字符",
-            trigger: "blur",
-          },
-        ],
-      },
-    };
+            message: '密码必须是6-15的非空字符',
+            trigger: 'blur'
+          }
+        ]
+      }
+    }
   },
   methods: {
     // 登录-- 点击事件
-    handleLogin() {
+    ...mapMutations(['updateToken']), // 第四步在方法中展开映射好的mutation中的函数
+    handleLogin () {
       this.$refs.loginRef.validate(async (valid) => {
         if (valid) {
           // console.log(this.loginForm);
           // 就是为了拿到后台真正的data数据 然后解构赋值给res
-          const { data: res } = await loginAPI(this.loginForm);
+          const { data: res } = await loginAPI(this.loginForm)
           // 此时res中的数据是真正的data
-          console.log(res);
+          console.log(res)
           // 根据后台返回的登录提示信息 做判断给用户提示
           if (res.code === 0) {
-            //成功
-            this.$message.success(res.message);
+            // 成功
+            this.$message.success(res.message)
+            this.updateToken(res.token) // 第五步  提交使用函数调用时接收实参 将data中的token值通过在mutation中定义好的函数保存在vuex中
+            this.$router.push('/home')
           } else {
             // 失败
-            this.$message.error(res.message);
+            this.$message.error(res.message)
           }
         } else {
-          return false;
+          return false
         }
-      });
-    },
-  },
-};
+      })
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>
