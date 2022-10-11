@@ -8,7 +8,7 @@ export const registerAPI = (obj) => {
   // return 这个Promise对象到逻辑层面去 去那边对Promise对象提取结果
   return request({
     url: "/api/reg",
-    method: "post",
+    method: "POST",
     //axios 的参数 parmas data
     //parmas 的对象参数名和值 axios源码会把参数和值，拼接在url?后面给后台  (query 查询字符串)
     //data 的对象参数名和值 ，axios源码会把参数和值，拼接在请求体里(body参数)
@@ -19,5 +19,18 @@ export const registerAPI = (obj) => {
 
   });
 };
-
-
+/**
+ * 
+ * @param {*} param0 {username:用户名 password:密码}
+ * @returns 
+ */
+export const loginAPI = ({username,password}) => {
+  return request({
+    url:"/api/login",
+    method:"POST",
+    data:{
+      username,
+      password
+    }
+  })
+}

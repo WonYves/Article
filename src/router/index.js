@@ -6,6 +6,10 @@ Vue.use(VueRouter)
 
 const routes = [
   {
+    path:'/',
+    redirect:'/login'
+  },
+  {
     path: '/login',
     component: () => import('@/views/login')  
     // webpack提供的让import函数来路由懒加载导入组件
