@@ -32,16 +32,33 @@ const router = new VueRouter({
   routes
 })
 
+// 1.浏览器第一次打开项目的时候 会触发一次全局路由守卫函数
+// 2.有token就登录了 没token就没登录
+// 3.next()方法强制切换路由地址，会再次走路由守卫再次去匹配路由表
 // 全局路由前置守卫 形参(
 // 1.to:要去的下一个路由的信息对象
 // 2.from:当前要离开的页面路由信息对象
 // 3.next方法)
+const whiteList = ['/login', '/reg'] // 白名单 (无需登录可以访问的路由地址)
 router.beforeEach((to, from, next) => {
   const token = store.state.token
-  if (token && !store.state.userInfo.username) {
-    // 你现在本地有token的值 才去请求用户的信息
-    store.dispatch('getUserInfoActions')
+  if (token) {
+    // 已登录
+    if (!store.state.userInfo.username) {
+      // 你现在本地有token的值 才去请求用户的信息
+      store.dispatch('getUserInfoActions')
+    }
+    next()
+  } else {
+    // 未登录
+    if (whiteList.includes(to.path)) {
+      // 未登录 可以访问的路由地址 则放行
+      next()
+    } else {
+    // next强制切换到登录的路径上
+      next('/login')
+    }
   }
-  next()
 })
+
 export default router
