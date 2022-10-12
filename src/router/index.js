@@ -8,11 +8,19 @@ const routes = [
   {
     path: '/',
     // redirect: '/login'
-    component: () => import('@/views/home')
+    component: () => import('@/views/home'),
+    redirect: '/head',
+    children: [
+      {
+        path: 'head',
+        component: () => import('@/views/head')
+      }
+    ]
   },
   {
     path: '/login',
     component: () => import('@/views/login')
+
     // webpack提供的让import函数来路由懒加载导入组件
     // 路由懒加载 当切换到login时  才加载对应组件的代码
     // 好处是为了让首页体积更小 打开的时候更快
@@ -51,6 +59,7 @@ router.beforeEach((to, from, next) => {
     next()
   } else {
     // 未登录
+    // 数组.includes(值)， 作用：判断是否在数组里出现过，出现过就返回true
     if (whiteList.includes(to.path)) {
       // 未登录 可以访问的路由地址 则放行
       next()
