@@ -99,11 +99,6 @@ export default {
       }
     }
   },
-  // created(){
-  //   axios({
-  //     data: this.form,
-  //   });
-  // },
   methods: {
     // 注册的点击事件
     registerFn () {

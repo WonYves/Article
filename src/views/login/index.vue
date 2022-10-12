@@ -81,6 +81,7 @@ export default {
           if (res.code === 0) {
             // 成功
             this.$message.success(res.message)
+            // this.$store.commit('updateToken', res.token)   一般写法 无需引入
             this.updateToken(res.token) // 第五步  提交使用函数调用时接收实参 将data中的token值通过在mutation中定义好的函数保存在vuex中
             this.$router.push('/')
           } else {

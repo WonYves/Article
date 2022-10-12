@@ -1,7 +1,6 @@
 // 封装的是具体的接口请求方法
 // 注意 每个方法只负责一个url地址
 import request from '@/utils/request'
-import store from '@/store'
 // 导出接口方法， 为了在逻辑页面引入后调用
 export const registerAPI = (obj) => {
   // 原地是一个Promise对象 内部包含原生ajax请求
@@ -35,12 +34,23 @@ export const loginAPI = ({ username, password }) => {
   })
 }
 
+/**
+ *
+ * @returns 获取用户信息
+ */
 export const getUserInfoAPI = () => {
   return request({
-    url: '/my/userinfo',
+    url: '/my/userinfo'
     // 传参给后台  parmas传的是查询字符串query data传的是body请求体 header传的请求头
-    headers: {
-      Authorization: store.state.token
-    }
+  })
+}
+
+/**
+ * 获取侧边栏数据
+ */
+
+export const getNavAPI = () => {
+  return request({
+    url: '/my/menus'
   })
 }
