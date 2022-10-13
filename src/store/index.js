@@ -31,11 +31,17 @@ export default new Vuex.Store({
   },
   actions: {
     // 请求用户信息
-    async getUserInfoActions (store) {
-      const res = await getUserInfoAPI()
-      console.log(res)
-      store.commit('updateUserInfo', res.data.data)
+    // async getUserInfoActions (store) {
+    //   const res = await getUserInfoAPI()
+    //   console.log(res)
+    //   store.commit('updateUserInfo', res.data.data)
+
+    getUserInfoActions (store) {
+      getUserInfoAPI().then(res => {
+        store.commit('updateUserInfo', res.data.data)
+      })
     }
+
   },
   modules: {},
   // 插件

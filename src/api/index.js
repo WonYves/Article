@@ -54,3 +54,22 @@ export const getNavAPI = () => {
     url: '/my/menus'
   })
 }
+
+/**
+ *
+ * @param {*} param0
+ * @returns 更新基本资料
+ */
+export const upDateInfoAPI = ({ id, username, nickname, email, user_pic }) => {
+  return request({
+    url: '/my/userinfo',
+    method: 'PUT',
+    data: {
+      id,
+      username,
+      nickname,
+      email,
+      user_pic
+    }
+  })
+}

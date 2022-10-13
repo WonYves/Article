@@ -7,13 +7,16 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    // redirect: '/login'
-    component: () => import('@/views/home'),
-    redirect: '/head',
+    component: () => import('@/views/layout'),
+    redirect: '/home',
     children: [
       {
-        path: 'head',
-        component: () => import('@/views/head')
+        path: 'home',
+        component: () => import('@/views/home')
+      },
+      {
+        path: 'user-info',
+        component: () => import('@/views/user/userInfo.vue')
       }
     ]
   },
@@ -29,10 +32,6 @@ const routes = [
     path: '/reg',
     component: () => import('@/views/register')
   }
-  //   {
-  //     path: '/home',
-  //     component: () => import('@/views/home')
-  //   }
 ]
 const router = new VueRouter({
   mode: 'history',
