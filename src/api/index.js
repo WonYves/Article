@@ -73,3 +73,19 @@ export const upDateInfoAPI = ({ id, username, nickname, email, user_pic }) => {
     }
   })
 }
+
+/**
+ *
+ * @param {*} avatar
+ * @returns 更新用户头像
+ */
+
+export const updateAvatarAPI = (avatar) => {
+  return request({
+    url: '/my/update/avatar',
+    method: 'PATCH',
+    data: {
+      avatar
+    }
+  })
+}
