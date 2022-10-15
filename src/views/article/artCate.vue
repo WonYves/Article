@@ -155,12 +155,25 @@ export default {
       console.log(obj)
       // 让弹窗出现
       this.dialogVisible = true
-      // 数据回显
-      this.addFrom.cate_name = obj.cate_name
-      this.addFrom.cate_alias = obj.cate_alias
+
+      // 让el-dialog第一次挂载el-from时 先用addform空字符串的初始值绑定到内部后续用作resetfields重置
+      // 所以让真实DOM先创建 并在内部绑定好'复制'好初始值
+
+      // 接着等数据绑定好了 再给数据回显
+      this.$nextTick(() => {
+        this.addFrom.cate_name = obj.cate_name
+        this.addFrom.cate_alias = obj.cate_alias
+      })
     }
   }
 }
+
+// 小bug
+// 在第一次打开网页的时候 文章分类 先点击修改 再点击新增  发现输入框有值
+// 原因 点击修改后 关闭对话框的时候 置空失效了
+// 具体分析：resetFields有问题： 对整个表单进行重置，将所有字段值重置为初始值并移除校验结果
+// 线索：Dialog 的内容是懒渲染的，即在第一次被打开之前，传入的默认 slot 不会被渲染到 DOM 上。因此，如果需要执行 DOM 操作，或通过 ref 获取相应组件，请在 open 事件回调中进行。
+// vue数据改变（先执行同步所有代码） 再去更新DOM（异步代码）
 </script>
 
 <style lang="less" scoped>
