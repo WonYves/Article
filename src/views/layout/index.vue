@@ -113,7 +113,7 @@ export default {
   },
   created () {
     getNavAPI().then((res) => {
-      console.log(res.data)
+      // console.log(res.data)
       this.menulist = res.data.data
     })
   },

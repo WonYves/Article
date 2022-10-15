@@ -15,7 +15,6 @@ export const registerAPI = (obj) => {
     // data:{username,
     // password,
     // repassword}
-
   })
 }
 /**
@@ -86,6 +85,66 @@ export const updateAvatarAPI = (avatar) => {
     method: 'PATCH',
     data: {
       avatar
+    }
+  })
+}
+
+/**
+ * 更改密码
+ * @param {*} param0
+ * @returns  promise对象
+ */
+export const userPwdAPI = ({ old_pwd, new_pwd, re_pwd }) => {
+  return request({
+    url: '/my/updatepwd',
+    method: 'PATCH',
+    data: {
+      old_pwd,
+      new_pwd,
+      re_pwd
+    }
+  })
+}
+
+/**
+ * 获取-文章分类
+ * @returns
+ */
+export const userCateAPI = () => {
+  return request({
+    url: '/my/cate/list'
+  })
+}
+
+/**
+ * 增加-文章分类
+ * @param {*} param0
+ * @returns
+ */
+export const userCateAddAPI = ({ cate_name, cate_alias }) => {
+  return request({
+    url: '/my/cate/add',
+    method: 'post',
+    data: {
+      cate_name,
+      cate_alias
+    }
+  })
+}
+
+/**
+ * 更新-文章分类
+ * @param {*} param0   {id:文章分类id，cate_name：文章分类名称, cate_alias：文章分类别名}
+ * @returns   promise对象
+ */
+export const updateArtCateAPI = ({ id, cate_name, cate_alias }) => {
+  return request({
+    url: '/my/cate/info',
+    method: 'PUT',
+    data: {
+      id,
+      cate_name,
+      cate_alias
     }
   })
 }

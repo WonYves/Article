@@ -15,17 +15,32 @@
           <el-input v-model="pwdForm.re_pwd" type="password"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">修改密码</el-button>
-          <el-button>重置</el-button>
+          <el-button type="primary" @click="handlePatch">修改密码</el-button>
+          <el-button @click="handleChange">重置</el-button>
         </el-form-item>
       </el-form>
     </el-card>
   </template>
 
 <script>
+import { userPwdAPI } from '@/api'
 export default {
   name: 'UserPwd',
   data () {
+    const samePwd = (rule, value, callback) => {
+      if (value === this.pwdForm.old_pwd) {
+        callback(new Error('新旧密码不能相同！'))
+      } else {
+        callback()
+      }
+    }
+    const rePwd = (rule, value, callback) => {
+      if (value !== this.pwdForm.new_pwd) {
+        callback(new Error('两次新密码不一致！'))
+      } else {
+        callback()
+      }
+    }
     return {
       // 表单的数据对象
       pwdForm: {
@@ -41,13 +56,36 @@ export default {
         ],
         new_pwd: [
           { required: true, message: '请输入新密码', trigger: 'blur' },
-          { pattern: /^\S{6,15}$/, message: '密码长度必须是6-15位的非空字符串', trigger: 'blur' }
+          { pattern: /^\S{6,15}$/, message: '密码长度必须是6-15位的非空字符串', trigger: 'blur' },
+          { validator: samePwd, trigger: 'blur' }
         ],
         re_pwd: [
           { required: true, message: '请再次确认新密码', trigger: 'blur' },
-          { pattern: /^\S{6,15}$/, message: '密码长度必须是6-15位的非空字符串', trigger: 'blur' }
+          { pattern: /^\S{6,15}$/, message: '密码长度必须是6-15位的非空字符串', trigger: 'blur' },
+          { validator: rePwd, trigger: 'blur' }
         ]
       }
+    }
+  },
+  methods: {
+    handleChange () {
+      // el -from 内置了一个重置表单（并且还能重置提示）
+      this.$refs.pwdFormRef.resetFields()
+    },
+    handlePatch () {
+      this.$refs.pwdFormRef.validate(async valid => {
+        if (valid) {
+          const { data: res } = await userPwdAPI(this.pwdForm)
+          if (res.code !== 0) return this.$message.error('原密码不一致')
+          this.$message.success('重置密码成功！')
+          this.$refs.pwdFormRef.resetFields()
+          this.$store.commit('updateToken', '')
+          this.$store.commit('updateUserInfo', '')
+          this.$router.push('/login')
+        } else {
+          return false
+        }
+      })
     }
   }
 }
