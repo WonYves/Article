@@ -29,6 +29,10 @@ const routes = [
       {
         path: 'art-cate', // 文章分类
         component: () => import('@/views/article/artCate')
+      },
+      {
+        path: 'art-list', // 文章分类
+        component: () => import('@/views/article/artList')
       }
     ]
   },

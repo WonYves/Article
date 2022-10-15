@@ -7,7 +7,7 @@
           >添加分类</el-button
         >
       </div>
-      <el-table style="width: 100%" :data="catelist" border stripe>
+      <el-table style="width: 100%" :data="catelist" :border="true" stripe>
         <el-table-column
           label="序号"
           width="100"
@@ -23,7 +23,7 @@
               @click="handleUpDate(scope.row)"
               >修改</el-button
             >
-            <el-button type="danger" size="mini">删除</el-button>
+            <el-button type="danger" size="mini" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -58,14 +58,17 @@
 </template>
 
 <script>
-import { userCateAPI, userCateAddAPI, updateArtCateAPI } from '@/api'
+import { userCateAPI, userCateAddAPI, updateArtCateAPI, deleteCateAPI } from '@/api'
 
 export default {
   name: 'ArtCate',
   data () {
     return {
+      // 接受数据列表
       catelist: [],
+      // 默认关闭对话框
       dialogVisible: false,
+      // from数据绑定
       addFrom: {
         cate_name: '',
         cate_alias: '',
@@ -73,6 +76,7 @@ export default {
         isEdit: false, //  true 为编辑 false 为新增
         editId: '' // 作唯一区别的Id值
       },
+      // 制定from校验规则
       addRules: {
         cate_name: [
           { required: true, message: '请输入分类名称', trigger: 'blur' },
@@ -97,11 +101,20 @@ export default {
     this.getCate()
   },
   methods: {
+    // 获取数据进行页面渲染
+
     async getCate () {
       const res = await userCateAPI()
-      console.log(res)
+      // console.log(res)
       this.catelist = res.data.data
     },
+
+    // getCate(){
+    //   userCateAPI().then(res=>{
+    //     this.catelist = res.data.data
+    //   })
+    // },
+
     // 关闭对话框时候重置对话框数据
     onAddClosedFn () {
       this.$refs.addRef.resetFields()
@@ -163,6 +176,24 @@ export default {
       this.$nextTick(() => {
         this.addFrom.cate_name = obj.cate_name
         this.addFrom.cate_alias = obj.cate_alias
+      })
+    },
+    // 删除分类-按钮点击
+    // async handleDelete(obj){
+    //   const {data:res} = await deleteCateAPI(obj.id)
+    //   if(res.code !==0) return this.$message.error(res.message)
+    //   this.$message.success(res.message)
+    //   //删除后再去后台调用最新的数据列表
+    //   this.getCate()
+    // },
+
+    handleDelete (obj) {
+      deleteCateAPI(obj.id).then(res => {
+        if (res.data.code === 0) {
+          this.$message.success(res.data.message)
+        }
+      }).then(res => {
+        this.getCate()
       })
     }
   }
