@@ -3,7 +3,7 @@
     <!-- 头部区域 -->
     <el-header>
       <!-- 左侧的 logo -->
-      <img src="../../assets/images/logo.png" alt="" />
+      <img src="../../assets/images/lpl1.png" alt="" />
       <!-- 右侧的菜单 -->
       <el-menu
         class="el-menu-top"

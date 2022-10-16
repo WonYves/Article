@@ -4,25 +4,25 @@
       <el-row class="spannel_list" :gutter="10">
         <el-col :sm="6" :xs="12">
           <div class="spannel">
-            <em>10015</em><span>篇</span>
+            <em>5873</em><span>篇</span>
             <b>总文章数</b>
           </div>
         </el-col>
         <el-col :sm="6" :xs="12">
           <div class="spannel scolor01">
-            <em>123</em><span>篇</span>
+            <em>77</em><span>篇</span>
             <b>日新增文章数</b>
           </div>
         </el-col>
         <el-col :sm="6" :xs="12">
           <div class="spannel scolor02">
-            <em>35</em><span>条</span>
+            <em>661</em><span>条</span>
             <b>评论总数</b>
           </div>
         </el-col>
         <el-col :sm="6" :xs="12">
           <div class="spannel scolor03">
-            <em>123</em><span>条</span>
+            <em>43</em><span>条</span>
             <b>日新增评论数</b>
           </div>
         </el-col>

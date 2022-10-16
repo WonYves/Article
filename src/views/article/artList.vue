@@ -28,8 +28,12 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="small">筛选</el-button>
-            <el-button type="info" size="small">重置</el-button>
+            <el-button type="primary" size="small" @click="choseFn"
+              >筛选</el-button
+            >
+            <el-button type="info" size="small" @click="resetFn"
+              >重置</el-button
+            >
           </el-form-item>
         </el-form>
         <!-- 发表文章的按钮 -->
@@ -45,17 +49,39 @@
       <!-- 文章表格区域 -->
       <!-- 文章表格区域 -->
       <el-table :data="artList" style="width: 100%" :border="true" stripe>
-        <el-table-column
-          el-table-column
-          label="文章标题"
-          prop="title"
-        ></el-table-column>
+        <el-table-column label="文章标题" prop="title">
+          <template v-slot="scope">
+            <el-link type="primary" @click="handleShowData(scope.row.id)">{{
+              scope.row.title
+            }}</el-link>
+          </template>
+        </el-table-column>
         <el-table-column label="分类" prop="cate_name"></el-table-column>
-        <el-table-column label="发表时间" prop="pub_date"></el-table-column>
+        <el-table-column label="发表时间" prop="pub_date">
+          <template v-slot="scope">
+            <span>{{ $formatDate(scope.row.pub_date) }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="状态" prop="state"></el-table-column>
-        <el-table-column label="操作"></el-table-column>
+        <el-table-column label="操作">
+          <template v-slot="{ row }">
+            <el-button type="danger" size="mini" @click="removeFn(row.id)">
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <!-- 分页区域 -->
+      <el-pagination
+        @size-change="handleSizeChangeFn"
+        @current-change="handleCurrentChangeFn"
+        :current-page.sync="q.pagenum"
+        :page-sizes="[2, 3, 5, 10]"
+        :page-size.sync="q.pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      >
+      </el-pagination>
     </el-card>
 
     <!-- 发表文章的 Dialog 对话框 -->
@@ -128,11 +154,45 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+
+    <!-- 查看文章详情的对话框 -->
+    <el-dialog title="文章预览" :visible.sync="detailVisible" width="80%">
+      <h1 class="title">{{ artDetail.title }}</h1>
+
+      <div class="info">
+        <span>作者：{{ artDetail.nickname || artDetail.username }}</span>
+        <span>发布时间：{{ $formatDate(artDetail.pub_date) }}</span>
+        <span>所属分类：{{ artDetail.cate_name }}</span>
+        <span>状态：{{ artDetail.state }}</span>
+      </div>
+
+      <!-- 分割线 -->
+      <el-divider></el-divider>
+
+      <!-- 文章的封面 -->
+      <img
+        v-if="artDetail.cover_img"
+        :src="baseURLR + artDetail.cover_img"
+        alt=""
+      />
+
+      <!-- 文章的详情 -->
+      <div v-html="artDetail.content" class="detail-box"></div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { userCateAPI, articleAddAPI, getArtListAPI } from '@/api'
+import {
+  userCateAPI,
+  articleAddAPI,
+  getArtListAPI,
+  getArticleDetailFn,
+  delArticleAPI
+} from '@/api'
+
+import { baseURL } from '@/utils/request'
+
 // 在标签和css 中引入图片可以写路径 在js中只能通过import方式导入
 // 在webpack中会把图片变为一个base64字符串/在打包后的图片临时地址
 import myImg from '@/assets/images/cover.jpg'
@@ -140,6 +200,9 @@ export default {
   name: 'ArtList',
   data () {
     return {
+      baseURLR: baseURL,
+      detailVisible: false, // 控制文章详情对话框显示隐藏
+      artDetail: [],
       artList: [], // 保存文章列表
       cateList: [], // 保存分类列表
       total: 0, // 保存现有文章的总数
@@ -208,7 +271,7 @@ export default {
     // 获取所有分类
     getList () {
       userCateAPI().then((res) => {
-        console.log(res.data.data)
+        // console.log(res.data.data);
         this.cateList = res.data.data
       })
     },
@@ -284,6 +347,64 @@ export default {
     dialogClose () {
       this.$refs.pubFormRef.resetFields()
       this.$refs.imgRef.setAttribute('src', myImg)
+    },
+    // 分页- 每页条数改变触发
+    handleSizeChangeFn (size) {
+      // size:当前需要每页显示的条数
+      this.q.pagesize = size
+      this.q.pagenum = 1
+      this.getartList()
+    },
+    // 当前页码改变时触发
+    handleCurrentChangeFn (nowPage) {
+      this.q.pagenum = nowPage
+      this.getartList()
+    },
+    // 筛选点击按钮事件
+    choseFn () {
+      this.q.pagenum = 1
+      this.q.pagesize = 2
+      this.getartList()
+    },
+    // 重置点击事件
+    resetFn () {
+      this.q.pagenum = 1
+      this.q.pagesize = 2
+      this.q.cate_id = ''
+      this.q.state = ''
+      this.getartList()
+    },
+    // 文章标题的点击事件
+    async handleShowData (artId) {
+      // art:文章的id值
+      const res = await getArticleDetailFn(artId)
+      this.artDetail = res.data.data
+      // console.log(this.artDetail);
+      this.detailVisible = true
+    },
+    // 删除文章按钮的点击事件
+    async removeFn (id) {
+    // 1. 询问用户是否要删除
+      const confirmResult = await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      // 2. 取消了删除
+      if (confirmResult === 'cancel') return
+
+      // 执行删除的操作
+      const { data: res } = await delArticleAPI(id)
+
+      if (res.code !== 0) return this.$message.error('删除失败!')
+      this.$message.success('删除成功!')
+      // 刷新列表数据
+      this.getartList()
+      if (this.artList.length === 1) {
+        if (this.q.pagenum > 1) {
+          this.q.pagenum--
+        }
+      }
     }
   },
   created () {
@@ -315,5 +436,28 @@ export default {
 // Vue提供了一个 ::v-deep样式语法 设置后 可以把属性选择器被自动添加到左侧
 ::v-deep .ql-editor {
   min-height: 400px;
+}
+
+//文章详情
+.title {
+  font-size: 24px;
+  text-align: center;
+  font-weight: normal;
+  color: #000;
+  margin: 0 0 10px 0;
+}
+
+.info {
+  font-size: 12px;
+  span {
+    margin-right: 20px;
+  }
+}
+
+// 修改 dialog 内部元素的样式，需要添加样式穿透
+::v-deep .detail-box {
+  img {
+    width: 500px;
+  }
 }
 </style>
