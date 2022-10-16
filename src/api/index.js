@@ -163,3 +163,35 @@ export const deleteCateAPI = (id) => {
     }
   })
 }
+
+/**
+ * // 发布文章
+ * @param {*} fd   表单数据对象
+ * @returns  promise对象
+ */
+export const articleAddAPI = (fd) => {
+  return request({
+    url: '/my/article/add',
+    method: 'post',
+    data: fd
+    // {} 如果是一个普通对象 axios会把他转成json的字符串在请求体里交给后台
+    // 这边后端需求是form-data 类型 表单数据对象 携带文件给后端
+  })
+}
+
+/**
+ * 获取-文章列表
+ * @param {*} param0  {pagenum 当前页码,pagesize 当前需要的数据条数,cate_id 文章分类id,state 文章状态}
+ * @returns promiese对象
+ */
+export const getArtListAPI = ({ pagenum, pagesize, cate_id, state }) => {
+  return request({
+    url: '/my/article/list',
+    params: {
+      pagenum,
+      pagesize,
+      cate_id,
+      state
+    }
+  })
+}

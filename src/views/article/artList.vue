@@ -43,7 +43,18 @@
       </div>
 
       <!-- 文章表格区域 -->
-
+      <!-- 文章表格区域 -->
+      <el-table :data="artList" style="width: 100%" :border="true" stripe>
+        <el-table-column
+          el-table-column
+          label="文章标题"
+          prop="title"
+        ></el-table-column>
+        <el-table-column label="分类" prop="cate_name"></el-table-column>
+        <el-table-column label="发表时间" prop="pub_date"></el-table-column>
+        <el-table-column label="状态" prop="state"></el-table-column>
+        <el-table-column label="操作"></el-table-column>
+      </el-table>
       <!-- 分页区域 -->
     </el-card>
 
@@ -53,6 +64,7 @@
       :visible.sync="pubDialogVisible"
       fullscreen
       :before-close="handleClose"
+      @close="dialogClose"
     >
       <!-- 发布文章的对话框 -->
       <el-form
@@ -79,7 +91,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="文章内容" prop="content">
-          <quill-editor v-model="pubForm.content"></quill-editor>
+          <quill-editor
+            v-model="pubForm.content"
+            @blur="contentChange"
+          ></quill-editor>
           <!-- 富文本 -->
         </el-form-item>
 
@@ -117,7 +132,7 @@
 </template>
 
 <script>
-import { userCateAPI } from '@/api'
+import { userCateAPI, articleAddAPI, getArtListAPI } from '@/api'
 // 在标签和css 中引入图片可以写路径 在js中只能通过import方式导入
 // 在webpack中会把图片变为一个base64字符串/在打包后的图片临时地址
 import myImg from '@/assets/images/cover.jpg'
@@ -125,15 +140,18 @@ export default {
   name: 'ArtList',
   data () {
     return {
-      cateList: [],
+      artList: [], // 保存文章列表
+      cateList: [], // 保存分类列表
+      total: 0, // 保存现有文章的总数
       // 查询参数对象
       q: {
-        pagenum: 1,
-        pagesize: 2,
-        cate_id: '',
-        state: ''
+        pagenum: 1, // 默认拿第一页的数据
+        pagesize: 2, // 默认当前页需要几条数据(传递给后台后台就返回几个数据)
+        cate_id: '', // 文章分类id
+        state: '' // 状态
       },
       pubDialogVisible: false, // 控制发布文章对话框出现 / 隐藏
+      // 表单数据//
       pubForm: {
         // 表单的数据对象
         title: '', // 文章的名称
@@ -142,6 +160,7 @@ export default {
         cover_img: '', // 封面图片（保存的是个文件）
         state: '' // 文章的发布状态，可选值有两个：草稿、已发布
       },
+      // 表单验证规则
       pubFormRules: {
         // 表单的验证规则对象
         title: [
@@ -157,11 +176,9 @@ export default {
           { required: true, message: '请选择文章标题', trigger: 'change' }
         ],
         content: [
-          { required: true, message: '请输入文章内容', trigger: 'blur' }
+          { required: true, message: '请输入文章内容', trigger: 'change' }
         ],
-        cover_img: [
-          { required: true, message: '请选择封面', trigger: 'blur' }
-        ]
+        cover_img: [{ required: true, message: '请选择封面', trigger: 'blur' }]
       }
     }
   },
@@ -195,6 +212,12 @@ export default {
         this.cateList = res.data.data
       })
     },
+    // 获取所有文章列表
+    async getartList () {
+      const { data: res } = await getArtListAPI(this.q)
+      this.artList = res.data // 保存当前获取的文章列表(有分页不是所有的数据)
+      this.total = res.total // 保存当前文章的总数
+    },
     // 选择封面点击事件  让文件选择窗口出现
     selCoverFn () {
       this.$refs.iptFileRef.click() // js来模拟一次点击事件
@@ -215,26 +238,57 @@ export default {
         const url = URL.createObjectURL(files[0])
         //              setAttribute 内置的方法（'属性名'，'赋予的值'）
         this.$refs.imgRef.setAttribute('src', url)
+
+        // 封面的校验
+        this.$refs.pubFormRef.validateField('cover_img')
       }
     },
     // 表单里面（点击发布/存为草稿） 点击按钮事件
     pubArticleFn (state) {
       // state 的值 "已发布"，或者 "草稿"（后端要求的参数值）
       this.pubForm.state = state
-      this.$refs.pubFormRef.validate(valid => {
+      this.$refs.pubFormRef.validate((valid) => {
         if (valid) {
           // 都通过
-          console.log(this.pubForm)
+          // console.log(this.pubForm)
+          // 准备一个表单数据容器的对象 formdata是h5新出的为了装文件内容和其他参数的一个容器
+          const fd = new FormData()
+          // 方法 .append("参数名"，值)
+          fd.append('title', this.pubForm.title)
+          fd.append('cate_id', this.pubForm.cate_id)
+          fd.append('content', this.pubForm.content)
+          fd.append('cover_img', this.pubForm.cover_img)
+          fd.append('state', this.pubForm.state)
+
+          articleAddAPI(fd)
+            .then((res) => {
+              console.log(res)
+              this.$message.success(res.data.message)
+              this.getartList()
+            })
+            .catch((err) => {
+              this.$message.error(err.data.message)
+            })
         } else {
           // 阻止默认行为
           return false
         }
       })
-      console.log(this.pubForm)
+      // console.log(this.pubForm)
+    },
+    // 富文本编辑器改变触发事件
+    contentChange () {
+      this.$refs.pubFormRef.validateField('content')
+    },
+    // 关闭发布文章时候的事件
+    dialogClose () {
+      this.$refs.pubFormRef.resetFields()
+      this.$refs.imgRef.setAttribute('src', myImg)
     }
   },
   created () {
     this.getList()
+    this.getartList()
   }
 }
 </script>
