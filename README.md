@@ -5,20 +5,14 @@
 yarn install
 ```
 
-### Compiles and hot-reloads for development
+### 下载依赖
 ```
 yarn serve
 ```
 
-### Compiles and minifies for production
-```
-yarn build
-```
+### 启动项目
 
-### Lints and fixes files
-```
-yarn lint
-```
+## 项目结构
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
