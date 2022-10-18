@@ -18,6 +18,8 @@ yarn serve
 ```
 vue-cli (自定义配置vue2脚手架)
 
+Less (css预处理语言)
+
 axios  (网络请求库)
 
 axios请求拦截器 (在发起时，统一携带请求头Authorization和token值,登录和注册页面除外)
