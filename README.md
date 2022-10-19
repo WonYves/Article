@@ -32,7 +32,7 @@ echarts   (图表  各种饼状图 柱状图 线性图)
 
 vue-router vuex   (vue相关生态路由 以及 vuex公共状态管理)
 
-vue-quill-editor  (富文本编辑器 用于发表文章)
+vue-quill-editor  (富文本编辑器 用于发表文章)    
 
 ```
 
