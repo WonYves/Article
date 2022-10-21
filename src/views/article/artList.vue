@@ -430,7 +430,7 @@ export default {
   object-fit: cover;
 }
 // 设置富文本编辑器的默认最小高度
-// ::v-deep作用: 穿透选择, 正常style上加了scope的话, 会给.ql-editor[data-v-hash]属性, 只能选择当前页面标签或者组件的根标签
+// ::v-deep作用: 穿透选择, 正常style上加了scoped的话, 会给.ql-editor[data-v-hash]属性, 只能选择当前页面标签或者组件的根标签
 // 如果想要选择组件内的标签(那些标签没有data-v-hash值)所以正常选择选不中, 加了::v-deep空格前置的话, 选择器就会变成如下形式
 // [data-v-hash] .ql-editor 这样就能选中组件内的标签的class类名了
 // Vue提供了一个 ::v-deep样式语法 设置后 可以把属性选择器被自动添加到左侧
